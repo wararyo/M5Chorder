@@ -1,0 +1,6 @@
+{
+    "terminal.integrated.env.osx": {
+        "PATH": "/Users/wararyo/.platformio/penv/bin:/Users/wararyo/.platformio/penv:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/opt/ImageMagick/bin:/Users/wararyo/android-ndk/",
+        "PLATFORMIO_CALLER": "vscode"
+    }
+}
