@@ -11,7 +11,7 @@ BLEServer *pServer;
 BLEAdvertising *pAdvertising;
 BLECharacteristic *pCharacteristic;
 bool isConnected = false;
-char midi[5];
+char pos = 0;
 
 uint8_t midiPacket[] = {
   0x80,  // header
@@ -41,7 +41,7 @@ int8_t getBatteryLevel()
 void sendNote(bool isNoteOn, int noteNo, int vel) {
   midiPacket[2] = isNoteOn ? 0x90 : 0x80; // note on/off, channel 0
   midiPacket[3] = noteNo; //snare note is 38
-  midiPacket[4] = 0;// velocity
+  midiPacket[4] = vel;// velocity
   pCharacteristic->setValue(midiPacket, 5); // packet, length in bytes)
   pCharacteristic->notify();
 }
@@ -65,8 +65,8 @@ class MyServerCallbacks: public BLEServerCallbacks {
 };
 
 class MyCallbacks: public BLECharacteristicCallbacks {
-    void onWrite(BLECharacteristic *pCharacteristic) {
-    }
+  void onWrite(BLECharacteristic *pCharacteristic) {
+  }
 };
 
 void setup() {
