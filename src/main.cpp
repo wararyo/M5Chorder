@@ -2,6 +2,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
+#include "M5StackUpdater.h"
 
 #define MIDI_SERVICE_UUID        "03b80e5a-ede8-4b33-a751-6ce34ec4c700"
 #define MIDI_CHARACTERISTIC_UUID "7772e5db-3868-4112-a1a9-f2669d106bf3"
@@ -10,8 +11,8 @@
 BLEServer *pServer;
 BLEAdvertising *pAdvertising;
 BLECharacteristic *pCharacteristic;
+
 bool isConnected = false;
-char pos = 0;
 
 uint8_t midiPacket[] = {
   0x80,  // header
@@ -40,8 +41,8 @@ int8_t getBatteryLevel()
 
 void sendNote(bool isNoteOn, int noteNo, int vel) {
   midiPacket[2] = isNoteOn ? 0x90 : 0x80; // note on/off, channel 0
-  midiPacket[3] = noteNo; //snare note is 38
-  midiPacket[4] = vel;// velocity
+  midiPacket[3] = noteNo;
+  midiPacket[4] = vel;
   pCharacteristic->setValue(midiPacket, 5); // packet, length in bytes)
   pCharacteristic->notify();
 }
@@ -72,6 +73,13 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 void setup() {
   M5.begin();
   Wire.begin();
+
+  //SD Updater
+  if(digitalRead(BUTTON_A_PIN) == 0) {
+    Serial.println("Will Load menu binary");
+    updateFromFS(SD);
+    ESP.restart();
+  }
 
   //バッテリー残量の表示
   M5.Lcd.clear();
