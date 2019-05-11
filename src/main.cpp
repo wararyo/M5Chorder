@@ -4,6 +4,7 @@
 #include <BLEServer.h>
 #include "M5StackUpdater.h"
 #include "Chord.h"
+#include "Scale.h"
 
 #define MIDI_SERVICE_UUID        "03b80e5a-ede8-4b33-a751-6ce34ec4c700"
 #define MIDI_CHARACTERISTIC_UUID "7772e5db-3868-4112-a1a9-f2669d106bf3"
@@ -16,6 +17,7 @@ BLECharacteristic *pCharacteristic;
 bool isConnected = false;
 
 std::vector<uint8_t> playingNotes;
+Scale scale = Scale();
 
 uint8_t midiPacket[] = {
   0x80,  // header
@@ -145,9 +147,9 @@ void setup() {
   pAdvertising->start();
 }
 
-Chord CM7 = Chord(Chord::C,Chord::MajorSeventh);
-Chord FM7 = Chord(Chord::F,Chord::MajorSeventh);
-Chord G7 = Chord(Chord::G,Chord::Seventh);
+Chord CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
+Chord FM7 = scale.degreeToChord(4,0,Chord(Chord::F,Chord::MajorSeventh));
+Chord G7 =  scale.degreeToChord(5,0,Chord(Chord::G,Chord::Seventh));
 
 void loop() {
   if(!isConnected && M5.BtnA.wasPressed()) M5.Power.deepSleep();
