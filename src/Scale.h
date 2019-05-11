@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include <memory>
 #include <map>
 #include <WString.h>
 #include <functional>
@@ -12,17 +13,19 @@ class ScaleBase;
 
 //Chordクラスと同様に現在使っているスケールを管理するためのクラス
 class Scale {
+protected:
+    static std::vector<std::shared_ptr<ScaleBase>> availableScales;
 public:
     Scale();
+    Scale(uint8_t key);
     uint8_t key = 0; //主音 C=0
     ScaleBase *currentScale;
-
-    static std::vector<ScaleBase> availableScales;
 
     //Degree: 一般に1-7までの値 Offset: ♭=-1 ♯=+1
     Chord degreeToChord(uint8_t degree, uint8_t offset, Chord base);
     Chord degreeToChord(uint8_t degree, uint8_t offset, uint8_t option) { return degreeToChord(degree, offset, Chord(Chord::C, option)); }
     String toString();
+    static std::vector<std::shared_ptr<ScaleBase>> getAvailableScales();
 };
 
 //ある特定の種類のスケールを定義するための基底クラス

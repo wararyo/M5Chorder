@@ -1,11 +1,13 @@
 #include "Scale.h"
 #include "Chord.h"
 
-std::vector<ScaleBase> Scale::availableScales = {MajorScale(), MinorScale()};
+std::vector<std::shared_ptr<ScaleBase>> Scale::availableScales;
 
-Scale::Scale() {
-    currentScale = &availableScales[0];
+Scale::Scale(uint8_t key) : key(key) {
+    currentScale = getAvailableScales()[0].get();
 }
+
+Scale::Scale() : key(0) {}
 
 String Scale::toString() {
     return key + currentScale->name;
@@ -13,6 +15,14 @@ String Scale::toString() {
 
 Chord Scale::degreeToChord(uint8_t degree, uint8_t offset, Chord base) {
     return currentScale->degreeToChord(key,degree,offset,base);
+}
+
+std::vector<std::shared_ptr<ScaleBase>> Scale::getAvailableScales() {
+    if(availableScales.empty()) {
+        availableScales.push_back(std::make_shared<MajorScale>());
+        availableScales.push_back(std::make_shared<MinorScale>());
+    }
+    return availableScales;
 }
 
 Chord MajorScale::degreeToChord(uint8_t key, uint8_t degree, uint8_t offset, Chord base) {
