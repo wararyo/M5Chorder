@@ -15,6 +15,8 @@ BLECharacteristic *pCharacteristic;
 
 bool isConnected = false;
 
+std::vector<uint8_t> playingNotes;
+
 uint8_t midiPacket[] = {
   0x80,  // header
   0x80,  // timestamp, not implemented
@@ -48,6 +50,30 @@ void sendNote(bool isNoteOn, int noteNo, int vel) {
   pCharacteristic->notify();
 }
 
+void sendNotes(bool isNoteOn, std::vector<uint8_t> notes, int vel) {
+  if(isNoteOn) {
+    for(uint8_t n : notes) {
+      sendNote(isNoteOn, n, vel);
+    }
+    playingNotes.insert(playingNotes.end(),notes.begin(),notes.end());
+  }
+  else {
+    for(uint8_t n : playingNotes) {
+      sendNote(false, n, 0);
+    }
+    playingNotes.clear();
+  }
+}
+
+void playChord(Chord chord) {
+  sendNotes(true,chord.toMidiNoteNumbers(64,16),120);
+  M5.Lcd.setTextSize(4);
+  M5.Lcd.clear(BLACK);
+  M5.Lcd.setTextDatum(CC_DATUM);
+  M5.Lcd.setTextSize(5);
+  M5.Lcd.drawString(chord.toString(), 160, 120, 2);
+}
+
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       M5.Lcd.fillScreen(BLACK);
@@ -74,6 +100,8 @@ class MyCallbacks: public BLECharacteristicCallbacks {
 void setup() {
   M5.begin();
   Wire.begin();
+
+  playingNotes = std::vector<uint8_t>();//仮
 
   //SD Updater
   if(digitalRead(BUTTON_A_PIN) == 0) {
@@ -117,13 +145,17 @@ void setup() {
   pAdvertising->start();
 }
 
+Chord CM7 = Chord(Chord::C,Chord::MajorSeventh);
+Chord FM7 = Chord(Chord::F,Chord::MajorSeventh);
+Chord G7 = Chord(Chord::G,Chord::Seventh);
+
 void loop() {
-  if(!isConnected && M5.BtnA.wasPressed()) M5.powerOFF();
-  if(M5.BtnA.wasPressed()) sendNote(true,60,120);
-  if(M5.BtnA.wasReleased()) sendNote(false,60,120);
-  if(M5.BtnB.wasPressed()) sendNote(true,62,120);
-  if(M5.BtnB.wasReleased()) sendNote(false,62,120);
-  if(M5.BtnC.wasPressed()) sendNote(true,64,120);
-  if(M5.BtnC.wasReleased()) sendNote(false,64,120);
+  if(!isConnected && M5.BtnA.wasPressed()) M5.Power.deepSleep();
+  if(M5.BtnA.wasPressed())  playChord(CM7);
+  if(M5.BtnA.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
+  if(M5.BtnB.wasPressed())  playChord(FM7);
+  if(M5.BtnB.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
+  if(M5.BtnC.wasPressed())  playChord(G7);
+  if(M5.BtnC.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
   M5.update();
 }

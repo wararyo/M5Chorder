@@ -6,7 +6,6 @@
 #include <map>
 #include <WString.h>
 #include <functional>
-#include "MidiNote.h"
 
 class Chord {
 public:
@@ -51,7 +50,7 @@ public:
     Chord();
     Chord(uint8_t root, uint16_t option);
     
-    std::vector<MidiNote> toMidiNotes();
+    std::vector<uint8_t> toMidiNoteNumbers(uint8_t centerNoteNo, uint8_t region);
     String toString();
 
 protected:
@@ -75,6 +74,10 @@ protected:
         {ThirteenthSharp , "♯13"},
         {ThirteenthFlat  , "♭13"},
     };
+
+    uint8_t maxNoteNo;
+    uint8_t minNoteNo;
+    void addMidiNote(std::vector<uint8_t>* notes,uint8_t noteNo);
 };
 
 #endif
