@@ -1,8 +1,9 @@
 #include <M5Stack.h>
 #include <M5TreeView.h>
+#include <vector>
 #include "M5StackUpdater.h"
 #include "MenuItemPitch.h"
-//include "MenuItemScale.h"
+#include "MenuItemScale.h"
 #include "BLEMidi.h"
 #include "Chord.h"
 #include "Scale.h"
@@ -13,6 +14,9 @@
 
 std::vector<uint8_t> playingNotes;
 Scale scale = Scale(0);
+Chord CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
+Chord FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
+Chord G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
 
 M5TreeView tv;
 typedef std::vector<MenuItem*> vmi;
@@ -110,18 +114,18 @@ class CharacteristicCallbacks: public BLECharacteristicCallbacks {
 void callBackKey(MenuItem* sender) {
   MenuItemPitch* mi((MenuItemPitch*)sender);
   scale.key = mi->value;
-  Chord CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
-  Chord FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
-  Chord G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
+  CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
+  FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
+  G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
 }
 
-// void callBackScale(MenuItem* sender) {
-//   MenuItemPitch* mi((MenuItemPitch*)sender);
-//   scale.currentScale = Scale::getAvailableScales()[mi->value].get();
-//   Chord CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
-//   Chord FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
-//   Chord G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
-// }
+void callBackScale(MenuItem* sender) {
+  MenuItemPitch* mi((MenuItemPitch*)sender);
+  scale.currentScale = Scale::getAvailableScales()[mi->value].get();
+  CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
+  FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
+  G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
+}
 
 void setup() {
   M5.begin();
@@ -143,14 +147,14 @@ void setup() {
     new ServerCallbacks(), new CharacteristicCallbacks());
 
   //FunctionMenu
-  //auto scales = Scale::getAvailableScales();
-  //auto iter = std::find(scales.begin(), scales.end(), scale.currentScale);
-  //size_t scaleIndex = 0;//std::distance(scales.begin(), iter); //現在のスケールのIndexを求める
+  auto scales = Scale::getAvailableScales();
+  auto iter = std::find(scales.begin(), scales.end(), std::shared_ptr<ScaleBase>(scale.currentScale));
+  size_t scaleIndex = std::distance(scales.begin(), iter); //現在のスケールのIndexを求める
   tv.setItems(vmi{
     new MenuItem("ahoge"),
     new MenuItem("ahoge"),
-    new MenuItemPitch("Key", scale.key, callBackKey)
-    //new MenuItemScale("Scale", scaleIndex, callBackScale)
+    new MenuItemPitch("Key", scale.key, callBackKey),
+    new MenuItemScale("Scale", scaleIndex, callBackScale)
   });
   M5ButtonDrawer::width = 106;
   tv.clientRect.x = 2;
@@ -163,10 +167,6 @@ void setup() {
   tv.useJoyStick    = true;
   tv.usePLUSEncoder = true;
 }
-
-Chord CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
-Chord FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
-Chord G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
 
 void loop() {
   switch(currentScene) {
