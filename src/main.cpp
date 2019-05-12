@@ -2,7 +2,7 @@
 #include <M5TreeView.h>
 #include <vector>
 #include "M5StackUpdater.h"
-#include "MenuItemPitch.h"
+#include "MenuItemKey.h"
 #include "MenuItemScale.h"
 #include "BLEMidi.h"
 #include "Chord.h"
@@ -112,7 +112,7 @@ class CharacteristicCallbacks: public BLECharacteristicCallbacks {
 };
 
 void callBackKey(MenuItem* sender) {
-  MenuItemPitch* mi((MenuItemPitch*)sender);
+  MenuItemKey* mi((MenuItemKey*)sender);
   scale.key = mi->value;
   CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
   FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
@@ -120,7 +120,7 @@ void callBackKey(MenuItem* sender) {
 }
 
 void callBackScale(MenuItem* sender) {
-  MenuItemPitch* mi((MenuItemPitch*)sender);
+  MenuItemKey* mi((MenuItemKey*)sender);
   scale.currentScale = Scale::getAvailableScales()[mi->value].get();
   CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
   FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
@@ -150,7 +150,7 @@ void setup() {
   tv.setItems(vmi{
     new MenuItem("ahoge"),
     new MenuItem("ahoge"),
-    new MenuItemPitch("Key", scale.key, callBackKey),
+    new MenuItemKey("Key", scale.key, callBackKey),
     new MenuItemScale("Scale", 0, callBackScale)
   });
   M5ButtonDrawer::width = 106;

@@ -1,14 +1,14 @@
-#include <MenuItemPitch.h>
+#include <MenuItemKey.h>
 #include <M5PLUSEncoder.h>
 #include <M5JoyStick.h>
 #include <Rect16.h>
 #include <Chord.h>
 
-void MenuItemPitch::onAfterDraw(){
+void MenuItemKey::onAfterDraw(){
   drawNum(value, 0);
 }
 
-void MenuItemPitch::setValue(int value)
+void MenuItemKey::setValue(int value)
 {
   if (minimum <= value && value <= maximum && this->value != value) {
     this->value = value;
@@ -16,7 +16,7 @@ void MenuItemPitch::setValue(int value)
   }
 }
 
-void MenuItemPitch::onEnter() {
+void MenuItemKey::onEnter() {
   draw();
   M5ButtonDrawer btnDrawer;
   btnDrawer.setText(0, "-");
@@ -71,7 +71,7 @@ void MenuItemPitch::onEnter() {
   } while (!btn2.wasReleased());
 }
 
-void MenuItemPitch::drawNum(int value, int flg)
+void MenuItemKey::drawNum(int value, int flg)
 {
   applyFont();
   String str(Chord::rootStrings[value]);
