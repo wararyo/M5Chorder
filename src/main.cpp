@@ -2,6 +2,7 @@
 #include <BLEDevice.h>
 #include <BLEUtils.h>
 #include <BLEServer.h>
+#include <M5TreeView.h>
 #include "M5StackUpdater.h"
 #include "Chord.h"
 #include "Scale.h"
@@ -19,6 +20,39 @@ bool isConnected = false;
 std::vector<uint8_t> playingNotes;
 Scale scale = Scale(0);
 
+//画面
+enum Scene : uint8_t {
+  Connection,
+  Play,
+  Function,
+  length
+};
+
+Scene currentScene = Scene::length; //初回changeSceneにて正しく描画するためConnection以外を指定
+
+void changeScene(Scene scene) {
+  if(currentScene == scene) return;
+  M5.Lcd.clear();
+  switch(scene) {
+    case Scene::Connection:
+      M5.Lcd.setCursor(0, 48);
+      M5.Lcd.setTextSize(4);
+      M5.Lcd.println("BLE MIDI\n");
+      M5.Lcd.setTextSize(1);
+      M5.Lcd.println("Press the button A to power off.");
+    break;
+    case Scene::Play:
+      M5.Lcd.setCursor(0,0);
+      M5.Lcd.setTextSize(2);
+      M5.Lcd.println(scale.key + scale.currentScale->name);
+    break;
+    case Scene::Function:
+
+    break;
+  }
+  currentScene = scene;
+}
+
 uint8_t midiPacket[] = {
   0x80,  // header
   0x80,  // timestamp, not implemented
@@ -26,23 +60,6 @@ uint8_t midiPacket[] = {
   0x3c,  // 0x3c == 60 == middle c
   0x00   // velocity
 };
-
-int8_t getBatteryLevel()
-{
-  Wire.beginTransmission(0x75);
-  Wire.write(0x78);
-  if (Wire.endTransmission(false) == 0
-   && Wire.requestFrom(0x75, 1)) {
-    switch (Wire.read() & 0xF0) {
-    case 0xE0: return 25;
-    case 0xC0: return 50;
-    case 0x80: return 75;
-    case 0x00: return 100;
-    default: return 0;
-    }
-  }
-  return -1;
-}
 
 void sendNote(bool isNoteOn, int noteNo, int vel) {
   midiPacket[2] = isNoteOn ? 0x90 : 0x80; // note on/off, channel 0
@@ -78,19 +95,13 @@ void playChord(Chord chord) {
 
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
-      M5.Lcd.fillScreen(BLACK);
-      M5.Lcd.setTextSize(1);
-      M5.Lcd.setCursor(10,0);
-      M5.Lcd.printf("BLE MIDI Connected.");
       isConnected = true;
+      changeScene(Scene::Play);
     };
 
     void onDisconnect(BLEServer* pServer) {
-      M5.Lcd.fillScreen(BLACK);
-      M5.Lcd.setTextSize(1);
-      M5.Lcd.setCursor(10,0);
-      M5.Lcd.printf("BLE MIDI Disconnected.");
       isConnected = false;
+      changeScene(Scene::Connection);
     }
 };
 
@@ -103,8 +114,6 @@ void setup() {
   M5.begin();
   Wire.begin();
 
-  playingNotes = std::vector<uint8_t>();//仮
-
   //SD Updater
   if(digitalRead(BUTTON_A_PIN) == 0) {
     Serial.println("Will Load menu binary");
@@ -112,18 +121,11 @@ void setup() {
     ESP.restart();
   }
 
-  //バッテリー残量の表示
-  M5.Lcd.clear();
-  M5.Lcd.setCursor(0, 20);
-  M5.Lcd.setTextSize(2);
-  M5.Lcd.print("Battery Level: ");
-  M5.Lcd.print(getBatteryLevel());
-  M5.Lcd.print("%\n\n");
-  M5.Lcd.println("BLE MIDI");
-  M5.Lcd.println("Press the button A\nto power off.");
+  changeScene(Scene::Connection);
 
   Serial.begin(115200);
 
+  //TODO: BLEMidi.begin();
   BLEDevice::init(DEVICE_NAME);
   pServer = BLEDevice::createServer();
   pServer->setCallbacks(new MyServerCallbacks());
@@ -152,12 +154,22 @@ Chord FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
 Chord G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
 
 void loop() {
-  if(!isConnected && M5.BtnA.wasPressed()) M5.Power.deepSleep();
-  if(M5.BtnA.wasPressed())  playChord(CM7);
-  if(M5.BtnA.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
-  if(M5.BtnB.wasPressed())  playChord(FM7);
-  if(M5.BtnB.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
-  if(M5.BtnC.wasPressed())  playChord(G7);
-  if(M5.BtnC.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
-  M5.update();
+  switch(currentScene) {
+    case Scene::Connection:
+      M5.update();
+      if(M5.BtnA.wasPressed()) M5.Power.deepSleep();
+    break;
+    case Scene::Play:
+      M5.update();
+      if(M5.BtnA.wasPressed())  playChord(CM7);
+      if(M5.BtnA.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
+      if(M5.BtnB.wasPressed())  playChord(FM7);
+      if(M5.BtnB.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
+      if(M5.BtnC.wasPressed())  playChord(G7);
+      if(M5.BtnC.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
+    break;
+    case Scene::Function:
+
+    break;
+  }
 }
