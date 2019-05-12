@@ -105,11 +105,6 @@ class CharacteristicCallbacks: public BLECharacteristicCallbacks {
   }
 };
 
-void callBackExitFunction(MenuItem* sender)
-{
-  changeScene(Scene::Play);
-}
-
 void setup() {
   M5.begin();
   Wire.begin();
@@ -133,7 +128,6 @@ void setup() {
   tv.setItems(vmi{
     new MenuItem("ahoge"),
     new MenuItem("ahoge"),
-    new MenuItem("exit", callBackExitFunction)
   });
   M5ButtonDrawer::width = 106;
   tv.clientRect.x = 2;
@@ -170,6 +164,7 @@ void loop() {
     break;
     case Scene::Function:
       tv.update();
+      if(M5.BtnA.wasPressed() && (M5TreeView::getFocusItem()->parentItem() == &tv)) changeScene(Scene::Play);
     break;
   }
   if(currentScene != requiredToChangeScene) _changeScene_raw();
