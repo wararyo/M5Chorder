@@ -147,14 +147,11 @@ void setup() {
     new ServerCallbacks(), new CharacteristicCallbacks());
 
   //FunctionMenu
-  auto scales = Scale::getAvailableScales();
-  auto iter = std::find(scales.begin(), scales.end(), std::shared_ptr<ScaleBase>(scale.currentScale));
-  size_t scaleIndex = std::distance(scales.begin(), iter); //現在のスケールのIndexを求める
   tv.setItems(vmi{
     new MenuItem("ahoge"),
     new MenuItem("ahoge"),
     new MenuItemPitch("Key", scale.key, callBackKey),
-    new MenuItemScale("Scale", scaleIndex, callBackScale)
+    new MenuItemScale("Scale", 0, callBackScale)
   });
   M5ButtonDrawer::width = 106;
   tv.clientRect.x = 2;
