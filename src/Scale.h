@@ -31,20 +31,20 @@ public:
 //ある特定の種類のスケールを定義するための基底クラス
 class ScaleBase {
 public:
-    String name = "BaseScale";
+    virtual String name() {return "BaseScale";};
     virtual Chord degreeToChord(uint8_t key, uint8_t degree, uint8_t offset, Chord base) {return base;};
 };
 
 class MajorScale : public ScaleBase {
 public:
-    const String name = "Major";
+    String name() {return "Major";};
     const uint8_t pitch[7] = {0,2,4,5,7,9,11};
     Chord degreeToChord(uint8_t key, uint8_t degree, uint8_t offset, Chord base) override;
 };
 
 class MinorScale : public ScaleBase {
 public:
-    const String name = "Minor";
+    String name() {return "Minor";};
     const uint8_t pitch[7] = {0,2,3,5,7,8,10};
     Chord degreeToChord(uint8_t key, uint8_t degree, uint8_t offset, Chord base) override;
 };

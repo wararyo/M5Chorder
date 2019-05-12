@@ -47,7 +47,7 @@ void changeScene(Scene scene) {
     case Scene::Play:
       M5.Lcd.setCursor(0,0);
       M5.Lcd.setTextSize(2);
-      M5.Lcd.println(scale.key + scale.currentScale->name);
+      M5.Lcd.println(scale.toString());
     break;
     case Scene::Function:
       tv.begin();

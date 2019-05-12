@@ -10,7 +10,7 @@ Scale::Scale(uint8_t key) : key(key) {
 Scale::Scale() : key(0) {}
 
 String Scale::toString() {
-    return key + currentScale->name;
+    return key + currentScale->name();
 }
 
 Chord Scale::degreeToChord(uint8_t degree, uint8_t offset, Chord base) {
