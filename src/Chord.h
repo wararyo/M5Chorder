@@ -44,6 +44,9 @@ public:
     static const uint16_t ThirteenthSharp = 0b01000000 << 8;
     static const uint16_t ThirteenthFlat  = 0b10000000 << 8;
 
+    static const std::vector<String> rootStrings;
+    static const std::map<uint16_t,String> optionStrings;
+
     uint8_t root;
     uint16_t option;
 
@@ -54,27 +57,6 @@ public:
     String toString();
 
 protected:
-    const std::vector<String> rootStrings = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
-    const std::map<uint16_t,String> optionStrings = {
-        {Major  , ""},
-        {Minor  , "m"},
-        {Dimish , "dim"},
-        {Sus4   , "sus4"},
-        {Sus2   , "sus2"},
-        {Aug    , "aug"},
-        {Seventh, "7"},
-        {MajorSeventh, "M7"},
-        {Sixth, "6"},
-        {FifthFlat       , "♭5"},
-        {Ninth           , "9"},
-        {NinthSharp      , "♯9"},
-        {Eleventh        , "11"},
-        {EleventhSharp   , "♯11"},
-        {Thirteenth      , "13"},
-        {ThirteenthSharp , "♯13"},
-        {ThirteenthFlat  , "♭13"},
-    };
-
     uint8_t maxNoteNo;
     uint8_t minNoteNo;
     void addMidiNote(std::vector<uint8_t>* notes,uint8_t noteNo);

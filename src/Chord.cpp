@@ -48,3 +48,24 @@ void Chord::addMidiNote(std::vector<uint8_t>* notes,uint8_t noteNo) {
     while(noteNo < minNoteNo) noteNo += 12;
     notes->push_back(noteNo);
 }
+
+const std::vector<String> Chord::rootStrings = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
+const std::map<uint16_t,String> Chord::optionStrings = {
+        {Major  , ""},
+        {Minor  , "m"},
+        {Dimish , "dim"},
+        {Sus4   , "sus4"},
+        {Sus2   , "sus2"},
+        {Aug    , "aug"},
+        {Seventh, "7"},
+        {MajorSeventh, "M7"},
+        {Sixth, "6"},
+        {FifthFlat       , "♭5"},
+        {Ninth           , "9"},
+        {NinthSharp      , "♯9"},
+        {Eleventh        , "11"},
+        {EleventhSharp   , "♯11"},
+        {Thirteenth      , "13"},
+        {ThirteenthSharp , "♯13"},
+        {ThirteenthFlat  , "♭13"},
+    };
