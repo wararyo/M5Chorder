@@ -9,9 +9,11 @@
 #define MIDI_CHARACTERISTIC_UUID "7772e5db-3868-4112-a1a9-f2669d106bf3"
 #define DEVICE_NAME "M5Chord"
 
-
 std::vector<uint8_t> playingNotes;
 Scale scale = Scale(0);
+
+M5TreeView tv;
+typedef std::vector<MenuItem*> vmi;
 
 //画面
 enum Scene : uint8_t {
@@ -26,12 +28,20 @@ Scene currentScene = Scene::length; //初回changeSceneにて正しく描画す�
 void changeScene(Scene scene) {
   if(currentScene == scene) return;
   M5.Lcd.clear();
+
+  //終了処理
+  switch(currentScene) {
+
+  }
+
+  //開始処理
   switch(scene) {
     case Scene::Connection:
       M5.Lcd.setCursor(0, 48);
       M5.Lcd.setTextSize(4);
       M5.Lcd.println("BLE MIDI\n");
       M5.Lcd.setTextSize(1);
+      M5.Lcd.println("Advertising...");
       M5.Lcd.println("Press the button A to power off.");
     break;
     case Scene::Play:
@@ -40,7 +50,7 @@ void changeScene(Scene scene) {
       M5.Lcd.println(scale.key + scale.currentScale->name);
     break;
     case Scene::Function:
-
+      tv.begin();
     break;
   }
   currentScene = scene;
@@ -87,6 +97,11 @@ class CharacteristicCallbacks: public BLECharacteristicCallbacks {
   }
 };
 
+void callBackExitFunction(MenuItem* sender)
+{
+  changeScene(Scene::Play);
+}
+
 void setup() {
   M5.begin();
   Wire.begin();
@@ -104,6 +119,23 @@ void setup() {
 
   Midi.begin(DEVICE_NAME, MIDI_SERVICE_UUID, MIDI_CHARACTERISTIC_UUID,
     new ServerCallbacks(), new CharacteristicCallbacks());
+
+  //FunctionMenu
+  tv.setItems(vmi{
+    new MenuItem("ahoge"),
+    new MenuItem("ahoge"),
+    new MenuItem("exit", callBackExitFunction)
+  });
+  M5ButtonDrawer::width = 106;
+  tv.clientRect.x = 2;
+  tv.clientRect.y = 16;
+  tv.clientRect.w = 196;
+  tv.clientRect.h = 200;
+  tv.itemWidth = 176;
+  tv.useFACES       = true;
+  tv.useCardKB      = true;
+  tv.useJoyStick    = true;
+  tv.usePLUSEncoder = true;
 }
 
 Chord CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
@@ -118,6 +150,7 @@ void loop() {
     break;
     case Scene::Play:
       M5.update();
+      if(M5.BtnC.pressedFor(1000)) {changeScene(Scene::Function); break;}
       if(M5.BtnA.wasPressed())  playChord(CM7);
       if(M5.BtnA.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
       if(M5.BtnB.wasPressed())  playChord(FM7);
@@ -126,7 +159,7 @@ void loop() {
       if(M5.BtnC.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
     break;
     case Scene::Function:
-
+      tv.update();
     break;
   }
 }
