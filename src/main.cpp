@@ -1,6 +1,8 @@
 #include <M5Stack.h>
 #include <M5TreeView.h>
 #include "M5StackUpdater.h"
+#include "MenuItemPitch.h"
+//include "MenuItemScale.h"
 #include "BLEMidi.h"
 #include "Chord.h"
 #include "Scale.h"
@@ -105,6 +107,22 @@ class CharacteristicCallbacks: public BLECharacteristicCallbacks {
   }
 };
 
+void callBackKey(MenuItem* sender) {
+  MenuItemPitch* mi((MenuItemPitch*)sender);
+  scale.key = mi->value;
+  Chord CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
+  Chord FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
+  Chord G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
+}
+
+// void callBackScale(MenuItem* sender) {
+//   MenuItemPitch* mi((MenuItemPitch*)sender);
+//   scale.currentScale = Scale::getAvailableScales()[mi->value].get();
+//   Chord CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
+//   Chord FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
+//   Chord G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
+// }
+
 void setup() {
   M5.begin();
   Wire.begin();
@@ -125,9 +143,14 @@ void setup() {
     new ServerCallbacks(), new CharacteristicCallbacks());
 
   //FunctionMenu
+  //auto scales = Scale::getAvailableScales();
+  //auto iter = std::find(scales.begin(), scales.end(), scale.currentScale);
+  //size_t scaleIndex = 0;//std::distance(scales.begin(), iter); //現在のスケールのIndexを求める
   tv.setItems(vmi{
     new MenuItem("ahoge"),
     new MenuItem("ahoge"),
+    new MenuItemPitch("Key", scale.key, callBackKey)
+    //new MenuItemScale("Scale", scaleIndex, callBackScale)
   });
   M5ButtonDrawer::width = 106;
   tv.clientRect.x = 2;
