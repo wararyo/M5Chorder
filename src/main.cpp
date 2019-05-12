@@ -14,6 +14,7 @@ Scale scale = Scale(0);
 
 M5TreeView tv;
 typedef std::vector<MenuItem*> vmi;
+M5ButtonDrawer buttonDrawer;
 
 //画面
 enum Scene : uint8_t {
@@ -24,18 +25,23 @@ enum Scene : uint8_t {
 };
 
 Scene currentScene = Scene::length; //初回changeSceneにて正しく描画するためConnection以外を指定
+Scene requiredToChangeScene;
 
 void changeScene(Scene scene) {
-  if(currentScene == scene) return;
+  //描画処理をloopの最後で実行するために一旦別の変数に退避させる(フラグを立てる)
+  requiredToChangeScene = scene;
+}
+
+//setup()とloop()の最後にて実行　それ以外では触らない！
+void _changeScene_raw() {
   M5.Lcd.clear();
 
   //終了処理
   switch(currentScene) {
-
   }
 
   //開始処理
-  switch(scene) {
+  switch(requiredToChangeScene) {
     case Scene::Connection:
       M5.Lcd.setCursor(0, 48);
       M5.Lcd.setTextSize(4);
@@ -48,12 +54,14 @@ void changeScene(Scene scene) {
       M5.Lcd.setCursor(0,0);
       M5.Lcd.setTextSize(2);
       M5.Lcd.println(scale.toString());
+      buttonDrawer.setText("IM7","IVM7","V7/Menu");
+      buttonDrawer.draw(true);
     break;
     case Scene::Function:
       tv.begin();
     break;
   }
-  currentScene = scene;
+  currentScene = requiredToChangeScene;
 }
 
 void sendNotes(bool isNoteOn, std::vector<uint8_t> notes, int vel) {
@@ -74,7 +82,7 @@ void sendNotes(bool isNoteOn, std::vector<uint8_t> notes, int vel) {
 void playChord(Chord chord) {
   sendNotes(true,chord.toMidiNoteNumbers(64,16),120);
   M5.Lcd.setTextSize(4);
-  M5.Lcd.clear(BLACK);
+  M5.Lcd.fillRect(0,60,320,120,BLACK);
   M5.Lcd.setTextDatum(CC_DATUM);
   M5.Lcd.setTextSize(5);
   M5.Lcd.drawString(chord.toString(), 160, 120, 2);
@@ -114,6 +122,7 @@ void setup() {
   }
 
   changeScene(Scene::Connection);
+  _changeScene_raw();
 
   Serial.begin(115200);
 
@@ -157,9 +166,11 @@ void loop() {
       if(M5.BtnB.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
       if(M5.BtnC.wasPressed())  playChord(G7);
       if(M5.BtnC.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
+      buttonDrawer.draw();
     break;
     case Scene::Function:
       tv.update();
     break;
   }
+  if(currentScene != requiredToChangeScene) _changeScene_raw();
 }
