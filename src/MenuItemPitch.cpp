@@ -69,8 +69,6 @@ void MenuItemPitch::onEnter() {
       delay(10);
     }
   } while (!btn2.wasReleased());
-  draw(true,&this->rect);
-  updateButtons();
 }
 
 void MenuItemPitch::drawNum(int value, int flg)

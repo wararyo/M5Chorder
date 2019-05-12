@@ -69,8 +69,6 @@ void MenuItemScale::onEnter() {
       delay(10);
     }
   } while (!btn2.wasReleased());
-  draw(true,&this->rect);
-  updateButtons();
 }
 
 void MenuItemScale::drawNum(int value, int flg)
