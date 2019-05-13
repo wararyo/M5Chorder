@@ -51,7 +51,9 @@ void _changeScene_raw() {
     case Scene::Connection:
       M5.Lcd.setCursor(0, 48);
       M5.Lcd.setTextSize(4);
-      M5.Lcd.println("BLE MIDI\n");
+      M5.Lcd.println("BLEChorder");
+      M5.Lcd.setTextSize(2);
+      M5.Lcd.println("BLE MIDI Chordpad App\n");
       M5.Lcd.setTextSize(1);
       M5.Lcd.println("Advertising...");
       M5.Lcd.println("Press the button A to power off.");
@@ -148,8 +150,6 @@ void setup() {
 
   //FunctionMenu
   tv.setItems(vmi{
-    new MenuItem("ahoge"),
-    new MenuItem("ahoge"),
     new MenuItemKey("Key", scale.key, callBackKey),
     new MenuItemScale("Scale", 0, callBackScale)
   });
@@ -184,7 +184,7 @@ void loop() {
     break;
     case Scene::Function:
       tv.update();
-      if(M5.BtnA.wasPressed() && (M5TreeView::getFocusItem()->parentItem() == &tv)) changeScene(Scene::Play);
+      if(M5.BtnA.wasReleased() && (M5TreeView::getFocusItem()->parentItem() == &tv)) changeScene(Scene::Play);
     break;
   }
   if(currentScene != requiredToChangeScene) _changeScene_raw();
