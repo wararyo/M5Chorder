@@ -26,10 +26,10 @@ Contributors welcome!
 
 ## Using esptool (untested)
 1. Install esptool (or download M5Burner and use esptool.py in it).
-2. Download M5Chorder_1.0.0_bin.zip from [Releases](releases/).
+2. Download M5Chorder_1.0.0_bin.zip from [Releases](https://github.com/wararyo/M5Chorder/releases).
 3. Run the following.
 
 ``` sh
-# In case of 16MB-flash model and default 16MB partition
-esptool.py --chip esp32 --port /dev/tty.SLAB_USBtoUART --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_freq 40m 0x10000 M5Chorder.bin
+# Case of 16MB-flash model and default 16MB partition
+esptool --chip esp32 --port /dev/tty.SLAB_USBtoUART --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_freq 40m 0x10000 M5Chorder.bin
 ```
