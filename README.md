@@ -15,7 +15,7 @@ Contributors welcome!
 
 ## Using SDUpdater(or LovyanLauncher) (recommended)
 1. Install [SDUpdater](https://github.com/tobozo/M5Stack-SD-Updater) or [LovyanLauncher](https://github.com/lovyan03/M5Stack_LovyanLauncher) into your M5Stack.
-2. Download M5Chorder_1.0.0_bin.zip from [Releases](https://github.com/wararyo/M5Chorder/releases).
+2. Download M5Chorder_0.1.0_bin.zip from [Releases](https://github.com/wararyo/M5Chorder/releases).
 3. Prepare an SD Card and copy files like the following.
 4. Insert the SD into the M5Stack and execute.
 
@@ -38,7 +38,7 @@ Contributors welcome!
 
 ## Using esptool (untested)
 1. Install esptool.
-2. Download M5Chorder_1.0.0_bin.zip from [Releases](https://github.com/wararyo/M5Chorder/releases).
+2. Download M5Chorder_0.1.0_bin.zip from [Releases](https://github.com/wararyo/M5Chorder/releases).
 3. Run the following.
 
 ``` sh
