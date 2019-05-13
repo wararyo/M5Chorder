@@ -3,6 +3,8 @@ BLE Chord Pad App
 
 This is a M5Stack app which provides functions to play chords via Bluetooth Low Energy MIDI.
 
+[Walkthrough Video](https://youtu.be/04s6wCNV70E)
+
 ## Note
 Currently, it works only when connected to iOS😢   
 
