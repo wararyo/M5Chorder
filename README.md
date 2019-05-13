@@ -1,13 +1,13 @@
-# M5Chorder
+# M5Stack BLEChorder
 BLE Chord Pad App
 
 This is a M5Stack app which provides functions to play chords via Bluetooth Low Energy MIDI.
 
 ## Note
-Currently it works only when connected to iOS.  
+Currently it works only when connected to iOS  
 
 It uses 1.3M byte of program memory.  
-If you use M5Stack 4MB-flash model, change partition to Huge App (3MB No OTA).
+If you use M5Stack 4MB-flash model, change partition to "Huge App (3MB No OTA)".
 
 Contributors welcome!
 
