@@ -1,6 +1,11 @@
 #ifndef _MENUITEMSCALE_H_
 #define _MENUITEMSCALE_H_
 
+/*
+MenuItemScale is based on MenuItemNumeric.
+https://github.com/lovyan03/M5Stack_TreeView/blob/master/src/MenuItemNumeric.h
+*/
+
 #include <MenuItem.h>
 #include <Scale.h>
 

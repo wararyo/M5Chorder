@@ -49,3 +49,7 @@ Contributors welcome!
 # Case of 16MB-flash model and of default 16MB partition
 esptool --chip esp32 --port /dev/tty.SLAB_USBtoUART --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_freq 40m 0x10000 BLEChorder.bin
 ```
+
+# Credits
+
+* [M5TreeView](https://github.com/lovyan03/M5Stack_TreeView) by [lovyan03](https://github.com/lovyan03)
