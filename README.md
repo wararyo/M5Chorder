@@ -15,8 +15,20 @@ Contributors welcome!
 
 ## Using SDUpdater(or LovyanLauncher) (recommended)
 1. Install [SDUpdater](https://github.com/tobozo/M5Stack-SD-Updater) or [LovyanLauncher](https://github.com/lovyan03/M5Stack_LovyanLauncher) into your M5Stack.
-2. Prepare a SD Card and copy files as the following.
-3. Insert the SD into the M5Stack and execute.
+2. Download M5Chorder_1.0.0_bin.zip from [Releases](https://github.com/wararyo/M5Chorder/releases).
+3. Prepare a SD Card and copy files as the following.
+4. Insert the SD into the M5Stack and execute.
+
+```
+(SD Root)
+/
+├BLEChorder.bin
+├json
+│└BLEChorder.json
+└jpg
+  ├BLEChorder.jpg
+  └BLEChorder_gh.jpg
+```
 
 ## Using PlatformIO
 1. Install Visual Studio Code.
@@ -31,5 +43,5 @@ Contributors welcome!
 
 ``` sh
 # Case of 16MB-flash model and default 16MB partition
-esptool --chip esp32 --port /dev/tty.SLAB_USBtoUART --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_freq 40m 0x10000 M5Chorder.bin
+esptool --chip esp32 --port /dev/tty.SLAB_USBtoUART --baud 921600 --before default_reset --after hard_reset write_flash -z --flash_freq 40m 0x10000 BLEChorder.bin
 ```
