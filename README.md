@@ -4,7 +4,7 @@ BLE Chord Pad App
 This is a M5Stack app which provides functions to play chords via Bluetooth Low Energy MIDI.
 
 ## Note
-Currently it works only when connected to iOS  
+Currently it works only when connected to iOS😢   
 
 It uses 1.3M byte of program memory.  
 If you use M5Stack 4MB-flash model, change partition to "Huge App (3MB No OTA)".
@@ -33,7 +33,7 @@ Contributors welcome!
 ## Using PlatformIO
 1. Install Visual Studio Code.
 2. Install PlatformIO.
-3. Clone the repository;
+3. Clone the repository.
 4. Open repository folder in VSCode and run "PlatformIO: Upload".
 
 ## Using esptool (untested)
