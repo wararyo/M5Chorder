@@ -21,6 +21,7 @@ void BLEMidi::begin(std::string deviceName,
     );
     characteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
     characteristic->setCallbacks(characteristicCallback);
+    characteristic->addDescriptor(new BLE2902());
     service->start();
 
     //Start Advertising
@@ -30,6 +31,7 @@ void BLEMidi::begin(std::string deviceName,
     advertisementData.setName(deviceName);
     advertising = server->getAdvertising();
     advertising->setAdvertisementData(advertisementData);
+    advertising->addServiceUUID(MIDI_SERVICE_UUID);
 
     BLESecurity *security = new BLESecurity();
     security->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_BOND);
