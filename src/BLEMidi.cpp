@@ -1,14 +1,10 @@
 #include <BLEMidi.h>
 
 void BLEMidi::begin(std::string deviceName,
-    std::string midiServiceUUID,
-    std::string midiCharacteristicUUID,
     BLEServerCallbacks *serverCallback,
     BLECharacteristicCallbacks *characteristicCallback) {
 
     this->deviceName = deviceName;
-    this->midiServiceUUID = midiServiceUUID;
-    this->midiCharacteristicUUID = midiCharacteristicUUID;
 
     BLEDevice::init(deviceName);
     BLEDevice::setEncryptionLevel((esp_ble_sec_act_t)ESP_LE_AUTH_REQ_SC_BOND);

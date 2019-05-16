@@ -6,21 +6,22 @@
 #include <BLEUtils.h>
 #include <BLEServer.h>
 
+#define MIDI_SERVICE_UUID        "03b80e5a-ede8-4b33-a751-6ce34ec4c700"
+#define MIDI_CHARACTERISTIC_UUID "7772e5db-3868-4112-a1a9-f2669d106bf3"
+
 class BLEMidi {
 public:
     BLEServer *server;
     BLEAdvertising *advertising;
     BLECharacteristic *characteristic;
 
-    std::string deviceName;
-    std::string midiServiceUUID;
-    std::string midiCharacteristicUUID;
+    std::string deviceName = "BLEMidi";
+    std::string midiServiceUUID = MIDI_SERVICE_UUID;
+    std::string midiCharacteristicUUID = MIDI_CHARACTERISTIC_UUID;
 
     bool isConnected = false;
 
     void begin(std::string deviceName,
-        std::string midiServiceUUID,
-        std::string midiCharacteristicUUID,
         BLEServerCallbacks *serverCallback,
         BLECharacteristicCallbacks *chatacteristicCallback);
 
@@ -28,5 +29,16 @@ public:
 };
 
 extern BLEMidi Midi;
+
+class BLEMidiServerCallbacks: public BLEServerCallbacks {
+public:
+    virtual void onConnect(BLEServer* pServer) {
+        Midi.isConnected = true;
+    };
+
+    virtual void onDisconnect(BLEServer* pServer) {
+        Midi.isConnected = false;
+    }
+};
 
 #endif

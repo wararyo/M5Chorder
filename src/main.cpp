@@ -8,15 +8,13 @@
 #include "Chord.h"
 #include "Scale.h"
 
-#define MIDI_SERVICE_UUID        "03b80e5a-ede8-4b33-a751-6ce34ec4c700"
-#define MIDI_CHARACTERISTIC_UUID "7772e5db-3868-4112-a1a9-f2669d106bf3"
-#define DEVICE_NAME "M5Chord"
+#define DEVICE_NAME "BLEChorder"
 
 std::vector<uint8_t> playingNotes;
 Scale scale = Scale(0);
-Chord CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
-Chord FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
-Chord G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
+Chord IM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
+Chord IVM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
+Chord V7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
 
 M5TreeView tv;
 typedef std::vector<MenuItem*> vmi;
@@ -96,42 +94,38 @@ void playChord(Chord chord) {
   M5.Lcd.drawString(chord.toString(), 160, 120, 2);
 }
 
-class ServerCallbacks: public BLEServerCallbacks {
+class ServerCallbacks: public BLEMidiServerCallbacks {
     void onConnect(BLEServer* pServer) {
-      Midi.isConnected = true;
+      BLEMidiServerCallbacks::onConnect(pServer);
       changeScene(Scene::Play);
     };
 
     void onDisconnect(BLEServer* pServer) {
-      Midi.isConnected = false;
+      BLEMidiServerCallbacks::onDisconnect(pServer);
       changeScene(Scene::Connection);
     }
-};
-
-class CharacteristicCallbacks: public BLECharacteristicCallbacks {
-  void onWrite(BLECharacteristic *pCharacteristic) {
-  }
 };
 
 void callBackKey(MenuItem* sender) {
   MenuItemKey* mi((MenuItemKey*)sender);
   scale.key = mi->value;
-  CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
-  FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
-  G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
+  IM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
+  IVM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
+  V7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
 }
 
 void callBackScale(MenuItem* sender) {
   MenuItemKey* mi((MenuItemKey*)sender);
   scale.currentScale = Scale::getAvailableScales()[mi->value].get();
-  CM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
-  FM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
-  G7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
+  IM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
+  IVM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
+  V7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
 }
 
 void setup() {
   M5.begin();
   Wire.begin();
+  Serial.begin(9600);
 
   //SD Updater
   if(digitalRead(BUTTON_A_PIN) == 0) {
@@ -143,10 +137,7 @@ void setup() {
   changeScene(Scene::Connection);
   _changeScene_raw();
 
-  Serial.begin(115200);
-
-  Midi.begin(DEVICE_NAME, MIDI_SERVICE_UUID, MIDI_CHARACTERISTIC_UUID,
-    new ServerCallbacks(), new CharacteristicCallbacks());
+  Midi.begin(DEVICE_NAME, new ServerCallbacks(), NULL);
 
   //FunctionMenu
   tv.setItems(vmi{
@@ -174,11 +165,11 @@ void loop() {
     case Scene::Play:
       M5.update();
       if(M5.BtnC.pressedFor(1000)) {changeScene(Scene::Function); break;}
-      if(M5.BtnA.wasPressed())  playChord(CM7);
+      if(M5.BtnA.wasPressed())  playChord(IM7);
       if(M5.BtnA.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
-      if(M5.BtnB.wasPressed())  playChord(FM7);
+      if(M5.BtnB.wasPressed())  playChord(IVM7);
       if(M5.BtnB.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
-      if(M5.BtnC.wasPressed())  playChord(G7);
+      if(M5.BtnC.wasPressed())  playChord(V7);
       if(M5.BtnC.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
       buttonDrawer.draw();
     break;
