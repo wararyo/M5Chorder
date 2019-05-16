@@ -188,7 +188,11 @@ void loop() {
     break;
     case Scene::Play:
       M5.update();
-      if(M5.BtnC.pressedFor(1000)) {changeScene(Scene::Function); break;}
+      if(M5.BtnC.pressedFor(1000)) {
+        sendNotes(false,std::vector<uint8_t>(),120);
+        changeScene(Scene::Function);
+        break;
+      }
       if(M5.BtnA.wasPressed())  playChord(IM7);
       if(M5.BtnA.wasReleased()) sendNotes(false,std::vector<uint8_t>(),120);
       if(M5.BtnB.wasPressed())  playChord(IVM7);
