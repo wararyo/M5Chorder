@@ -1,6 +1,8 @@
 #include <M5Stack.h>
 #include <M5TreeView.h>
 #include <vector>
+#include <MenuItemToggle.h>
+#include <MenuItemNumeric.h>
 #include "M5StackUpdater.h"
 #include "MenuItemKey.h"
 #include "MenuItemScale.h"
@@ -12,9 +14,11 @@
 
 std::vector<uint8_t> playingNotes;
 Scale scale = Scale(0);
-Chord IM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
-Chord IVM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
-Chord V7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
+Chord IM7;
+Chord IVM7;
+Chord V7;
+bool seventh = true;
+uint8_t centerNoteNo = 64;
 
 M5TreeView tv;
 typedef std::vector<MenuItem*> vmi;
@@ -60,7 +64,7 @@ void _changeScene_raw() {
       M5.Lcd.setCursor(0,0);
       M5.Lcd.setTextSize(2);
       M5.Lcd.println(scale.toString());
-      buttonDrawer.setText("IM7","IVM7","V7/Menu");
+      buttonDrawer.setText(IM7.toString(),IVM7.toString(),V7.toString() + String("/Menu"));
       buttonDrawer.draw(true);
     break;
     case Scene::Function:
@@ -86,12 +90,19 @@ void sendNotes(bool isNoteOn, std::vector<uint8_t> notes, int vel) {
 }
 
 void playChord(Chord chord) {
-  sendNotes(true,chord.toMidiNoteNumbers(64,16),120);
+  sendNotes(true,chord.toMidiNoteNumbers(centerNoteNo,16),120);
   M5.Lcd.setTextSize(4);
   M5.Lcd.fillRect(0,60,320,120,BLACK);
   M5.Lcd.setTextDatum(CC_DATUM);
   M5.Lcd.setTextSize(5);
   M5.Lcd.drawString(chord.toString(), 160, 120, 2);
+  M5.Lcd.setTextDatum(TL_DATUM);
+}
+
+void setThreeChords() {
+  IM7 = scale.getDiatonic(0,seventh);
+  IVM7 = scale.getDiatonic(3,seventh);
+  V7 =  scale.getDiatonic(4,seventh);
 }
 
 class ServerCallbacks: public BLEMidiServerCallbacks {
@@ -109,17 +120,24 @@ class ServerCallbacks: public BLEMidiServerCallbacks {
 void callBackKey(MenuItem* sender) {
   MenuItemKey* mi((MenuItemKey*)sender);
   scale.key = mi->value;
-  IM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
-  IVM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
-  V7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
+  setThreeChords();
 }
 
 void callBackScale(MenuItem* sender) {
   MenuItemKey* mi((MenuItemKey*)sender);
   scale.currentScale = Scale::getAvailableScales()[mi->value].get();
-  IM7 = scale.degreeToChord(0,0,Chord(Chord::C,Chord::MajorSeventh));
-  IVM7 = scale.degreeToChord(3,0,Chord(Chord::C,Chord::MajorSeventh));
-  V7 =  scale.degreeToChord(4,0,Chord(Chord::C,Chord::Seventh));
+  setThreeChords();
+}
+
+void callBackSeventh(MenuItem* sender) {
+  MenuItemToggle* mi((MenuItemToggle*)sender);
+  seventh = mi->value;
+  setThreeChords();
+}
+
+void callBackCenterNoteNo(MenuItem* sender) {
+  MenuItemNumeric* mi((MenuItemNumeric*)sender);
+  centerNoteNo = mi->value;
 }
 
 void setup() {
@@ -140,20 +158,26 @@ void setup() {
   Midi.begin(DEVICE_NAME, new ServerCallbacks(), NULL);
 
   //FunctionMenu
-  tv.setItems(vmi{
-    new MenuItemKey("Key", scale.key, callBackKey),
-    new MenuItemScale("Scale", 0, callBackScale)
-  });
   M5ButtonDrawer::width = 106;
-  tv.clientRect.x = 2;
+  tv.clientRect.x = 60;
   tv.clientRect.y = 16;
-  tv.clientRect.w = 196;
+  tv.clientRect.w = 240;
   tv.clientRect.h = 200;
-  tv.itemWidth = 176;
+  tv.itemWidth = 192;
+  tv.itemHeight = 24;
   tv.useFACES       = true;
   tv.useCardKB      = true;
   tv.useJoyStick    = true;
   tv.usePLUSEncoder = true;
+  tv.setTextFont(2);
+  tv.setItems(vmi{
+    new MenuItemKey("Key", scale.key, callBackKey),
+    new MenuItemScale("Scale", 0, callBackScale),
+    new MenuItemToggle("Seventh",seventh,callBackSeventh),
+    new MenuItemNumeric("CenterNoteNo",24,81,centerNoteNo,callBackCenterNoteNo)
+  });
+  
+  setThreeChords();
 }
 
 void loop() {
@@ -175,7 +199,8 @@ void loop() {
     break;
     case Scene::Function:
       tv.update();
-      if(M5.BtnA.wasReleased() && (M5TreeView::getFocusItem()->parentItem() == &tv)) changeScene(Scene::Play);
+      // Press A at root to back to play scene
+      if(M5.BtnA.wasReleased() && !M5.BtnA.wasReleasefor(tv.msecHold) && (M5TreeView::getFocusItem()->parentItem() == &tv)) changeScene(Scene::Play);
     break;
   }
   if(currentScene != requiredToChangeScene) _changeScene_raw();
