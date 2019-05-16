@@ -200,7 +200,7 @@ void loop() {
     case Scene::Function:
       tv.update();
       // Press A at root to back to play scene
-      if(M5.BtnA.wasReleased() && !M5.BtnA.wasReleasefor(tv.msecHold) && (M5TreeView::getFocusItem()->parentItem() == &tv)) changeScene(Scene::Play);
+      if(M5.BtnA.wasPressed() && (M5TreeView::getFocusItem()->parentItem() == &tv)) changeScene(Scene::Play);
     break;
   }
   if(currentScene != requiredToChangeScene) _changeScene_raw();
