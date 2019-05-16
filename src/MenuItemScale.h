@@ -6,27 +6,18 @@ MenuItemScale is based on MenuItemNumeric.
 https://github.com/lovyan03/M5Stack_TreeView/blob/master/src/MenuItemNumeric.h
 */
 
-#include <MenuItem.h>
+#include <MenuItemSpinner.h>
 #include <Scale.h>
 
-class MenuItemScale : public MenuItem {
+class MenuItemScale : public MenuItemSpinner {
 public:
-  int minimum = 0;
-  int maximum = 1;
-  int value = 0;
-
   MenuItemScale(const String& title, int value, int tg = 0, TCallBackEnter cb = 0)
-  : MenuItem(title, tg, cb), value(value), maximum(Scale::getAvailableScales().size()) {};
+  : MenuItemSpinner(title,Scale::getAvailableScales().size() - 1, value, tg, cb) {};
 
   MenuItemScale(const String& title, int value, TCallBackEnter cb)
-  : MenuItem(title, cb), value(value), maximum(Scale::getAvailableScales().size()) {};
+  : MenuItemSpinner(title,Scale::getAvailableScales().size() - 1, value, cb) {};
 
-  virtual void onAfterDraw();
-  virtual void onEnter();
-  
-  void setValue(int value);
-private:
-  void drawNum(int value, int flg);
+  String getStringOfItem(int value) override;
 };
 
 #endif
