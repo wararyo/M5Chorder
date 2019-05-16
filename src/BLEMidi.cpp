@@ -11,6 +11,7 @@ void BLEMidi::begin(std::string deviceName,
     this->midiCharacteristicUUID = midiCharacteristicUUID;
 
     BLEDevice::init(deviceName);
+    BLEDevice::setEncryptionLevel((esp_ble_sec_act_t)ESP_LE_AUTH_REQ_SC_BOND);
 
     //Start Server
     server = BLEDevice::createServer();
@@ -19,10 +20,10 @@ void BLEMidi::begin(std::string deviceName,
     characteristic = service->createCharacteristic(
     BLEUUID(midiCharacteristicUUID),
     BLECharacteristic::PROPERTY_READ   |
-    BLECharacteristic::PROPERTY_WRITE  |
     BLECharacteristic::PROPERTY_NOTIFY |
     BLECharacteristic::PROPERTY_WRITE_NR
     );
+    characteristic->setAccessPermissions(ESP_GATT_PERM_READ_ENCRYPTED | ESP_GATT_PERM_WRITE_ENCRYPTED);
     characteristic->setCallbacks(characteristicCallback);
     service->start();
 
@@ -33,6 +34,12 @@ void BLEMidi::begin(std::string deviceName,
     advertisementData.setName(deviceName);
     advertising = server->getAdvertising();
     advertising->setAdvertisementData(advertisementData);
+
+    BLESecurity *security = new BLESecurity();
+    security->setAuthenticationMode(ESP_LE_AUTH_REQ_SC_BOND);
+    security->setCapability(ESP_IO_CAP_NONE);
+    security->setInitEncryptionKey(ESP_BLE_ENC_KEY_MASK | ESP_BLE_ID_KEY_MASK);
+
     advertising->start();
 }
 
