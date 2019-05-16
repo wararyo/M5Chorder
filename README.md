@@ -8,7 +8,7 @@ This is a M5Stack app which provides functions to play chords via Bluetooth Low 
 [🎥Walkthrough Video](https://youtu.be/04s6wCNV70E)
 
 ## Note
-**Now compatible with macOS and Windows!! 😆**  
+**Now works with iOS and macOS and Windows!! 😆**  
 
 It uses 1.3M byte of program memory.  
 If you use M5Stack 4MB-flash model, change the partition to "Huge App (3MB No OTA)".
